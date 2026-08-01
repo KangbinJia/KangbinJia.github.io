@@ -1,0 +1,172 @@
+<!-- My Travels Section Content -->
+<section id="travels" class="section">
+    <div class="container">
+        <div class="section-header">
+            <p class="section-title">環遊世界</p>
+            <h2>我的旅行</h2>
+        </div>
+
+        <div class="travels-intro">
+            <p>我喜歡探索新的地方,瞭解世界各地的文化!這是我一些旅行足跡的地圖 — 我會持續更新。</p>
+        </div>
+
+        <div class="world-map" id="travel-map-container">
+            <div id="map" class="leaflet-map-wrapper"></div>
+        </div>
+</section>
+
+<link rel="stylesheet" href="../assets/vendor/leaflet/leaflet.css" />
+<script src="../assets/vendor/leaflet/leaflet.js"></script>
+
+<style>
+.travel-map-heading {
+    margin: 1.5rem 0 1rem;
+    font-size: 1.75rem;
+    color: var(--primary-color);
+}
+
+#map {
+    width: 100%;
+    height: 650px;
+    border-radius: 18px;
+    overflow: hidden;
+    box-shadow: 0 12px 35px rgba(15, 23, 42, 0.15);
+    border: 1px solid rgba(37, 99, 235, 0.12);
+}
+
+.world-map {
+    margin-bottom: 2rem;
+}
+
+.travel-marker-wrapper {
+    background: transparent !important;
+    border: none !important;
+}
+
+.travel-marker {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--primary-color, #14213d);
+    border: 2px solid #ffffff;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.25);
+}
+
+.leaflet-popup-content-wrapper {
+    border-radius: 12px;
+}
+
+.leaflet-popup-content {
+    margin: 10px 12px;
+    line-height: 1.5;
+}
+
+.leaflet-popup-content strong {
+    display: block;
+    margin-bottom: 4px;
+    color: var(--primary-color);
+    font-size: 1rem;
+}
+
+.leaflet-popup-content .popup-date {
+    display: block;
+    font-size: 0.8rem;
+    color: var(--text-light);
+    margin-bottom: 6px;
+}
+
+.leaflet-popup-content .popup-description {
+    margin: 0;
+    color: var(--text-dark);
+}
+
+@media (max-width: 768px) {
+    #map {
+        height: 480px;
+        border-radius: 14px;
+    }
+}
+</style>
+
+<script>
+function initTravelMap() {
+    if (typeof window.L === 'undefined') {
+        const existingLeafletScript = document.querySelector('script[src*="leaflet.min.js"]');
+
+        if (existingLeafletScript) {
+            existingLeafletScript.addEventListener('load', () => initTravelMap(), { once: true });
+        } else {
+            const leafletScript = document.createElement('script');
+            leafletScript.src = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js';
+            leafletScript.onload = () => initTravelMap();
+            leafletScript.onerror = () => console.error('Leaflet failed to load.');
+            document.head.appendChild(leafletScript);
+        }
+
+        return;
+    }
+
+    // 複製以下結構來新增你自己的旅行記錄:
+    // { name: '城市, 國家', coords: [緯度, 經度], date: '月份 年份', description: '簡短說明' }
+    const myTravels = [
+        {
+            name: '美國馬薩諸塞州貝德福德 (Bedford)',
+            coords: [42.4906, -71.2765],
+            date: '家鄉',
+            description: '一切開始的地方!'
+        },
+        {
+            name: '新增你的第一次旅行!',
+            coords: [40.7128, -74.0060],
+            date: '____',
+            description: '編輯此檔案以新增真實的旅行記錄。'
+        }
+    ];
+
+    const map = window.L.map('map', {
+        zoomControl: true,
+        scrollWheelZoom: true
+    }).setView([20, 0], 2);
+
+    window.L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        maxZoom: 19
+    }).addTo(map);
+
+    const isDesktop = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+    const markerIcon = window.L.divIcon({
+        html: '<div class="travel-marker"></div>',
+        className: 'travel-marker-wrapper',
+        iconSize: [14, 14],
+        iconAnchor: [7, 7]
+    });
+
+    myTravels.forEach(trip => {
+        const marker = window.L.marker(trip.coords, {
+            title: trip.name,
+            icon: markerIcon
+        }).addTo(map);
+
+        const popupContent = `
+            <div class="leaflet-popup-content">
+                <strong>${trip.name}</strong>
+                <span class="popup-date">${trip.date}</span>
+                <p class="popup-description">${trip.description}</p>
+            </div>
+        `;
+
+        marker.bindPopup(popupContent);
+
+        if (isDesktop) {
+            marker.on('mouseover', () => marker.openPopup());
+            marker.on('mouseout', () => marker.closePopup());
+        }
+    });
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initTravelMap);
+} else {
+    initTravelMap();
+}
+</script>
